@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import {getVoronoi} from "./voronoi";
+
+
+
+// First I have to walk the tree and get a global registry of functions I have to traverse
 
 function App() {
+  const [el, setEl] = useState();
+  useEffect(() => {
+    if (el) {
+      const {voronoi: v, names, namesPoints} = getVoronoi()
+      // console.log(v.render())
+      el.height = v.ymax - v.ymin;
+      el.width = v.xmax - v.xmin;
+      const ctx = el.getContext('2d');
+      v.render(ctx);
+      ctx.stroke();
+      ctx.font = "30px Arial";
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const point = namesPoints[i];
+        ctx.fillText(name, ...point)
+      }
+    }
+  }, [el]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <canvas className="App" ref={setEl} width="1000" height="1000">
+      </canvas>
   );
 }
 
